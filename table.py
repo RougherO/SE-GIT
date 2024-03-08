@@ -1,10 +1,9 @@
 from rich.table import Table
 from rich.console import Console
-from task import Task
 
 console = Console()
 
-table = Table(
+_table = Table(
     "ID",
     "Title",
     "Description",
@@ -14,10 +13,13 @@ table = Table(
 )
 
 
-def renderTable(rows) -> None:
+def composeTable(rows) -> None:
     for row in rows:
-        table.add_row(
+        _table.add_row(
             *map(lambda elem: str(elem), row[:-1]),
             "FINISHED" if row[-1] else "PENDING",
         )
-    console.print(table)
+
+
+def renderTable() -> None:
+    console.print(_table)

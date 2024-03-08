@@ -3,14 +3,18 @@ import table
 
 from task import Task
 from typer import Typer, Argument, Option
+import typer
 
 cliapp = Typer(
+    name="taskcli",
     add_completion=False,
     options_metavar=False,
+    help="taskcli is a cli tool to manage tasks with command line",
 )
 
 short_help = "Add a new Task"
-help = "Add a new Task to your list with a title and description using the add command."
+help = "Add a new Task to your list with a title and description using the add command. Adding a description \
+to task is optional but a title is compulsory."
 
 
 @cliapp.command(
@@ -19,7 +23,7 @@ help = "Add a new Task to your list with a title and description using the add c
     short_help=short_help,
 )
 def addTask(
-    title: str,
+    title: str = Argument(help="New Task Title"),
     description: str = Argument(None, help="New Task Description"),
 ) -> None:
     db.insertTask(Task(title, description))
@@ -59,7 +63,9 @@ def updateTask(
 
 
 short_help = "View all tasks"
-help = "View all tasks completed or not in a tabular format"
+help = "View all tasks completed or not in a tabular format. --first and --last flags \
+can be used to retrieve first N tasks or last N tasks, by default shows all tasks. If number of first \
+and last tasks together is greater than the total tasks present then shows entire task list."
 
 
 @cliapp.command(
@@ -67,8 +73,23 @@ help = "View all tasks completed or not in a tabular format"
     help=help,
     short_help=short_help,
 )
-def view() -> None:
-    table.renderTable(db.getTasks())
+def view(
+    first: int = Option(None, help="Shows first N tasks"),
+    last: int = Option(None, help="Shows last N tasks"),
+) -> None:
+    if first and last:
+        if first + last > db.getRowCount():
+            table.composeTable(db.getTasks())
+        else:
+            table.composeTable(db.getTasks(-last))
+            table.composeTable(db.getTasks(first))
+    elif first:
+        table.composeTable(db.getTasks(first))
+    elif last:
+        table.composeTable(db.getTasks(-last))
+    else:
+        table.composeTable(db.getTasks())
+    table.renderTable()
 
 
 if __name__ == "__main__":
