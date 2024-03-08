@@ -3,7 +3,6 @@ import table
 
 from task import Task
 from typer import Typer, Argument, Option
-import typer
 
 cliapp = Typer(
     name="taskcli",
@@ -23,8 +22,15 @@ to task is optional but a title is compulsory."
     short_help=short_help,
 )
 def addTask(
-    title: str = Argument(help="New Task Title"),
-    description: str = Argument(None, help="New Task Description"),
+    title: str = Argument(
+        help="New Task Title",
+        show_default=False,
+    ),
+    description: str = Argument(
+        None,
+        help="New Task Description",
+        show_default=False,
+    ),
 ) -> None:
     db.insertTask(Task(title, description))
 
@@ -40,9 +46,23 @@ If no argument is provided then removes the last added task"
     short_help=short_help,
 )
 def removeTask(
-    id: int = Argument(None, help="Task ID"),
+    id: int = Argument(
+        None,
+        help="Task ID",
+        show_default=False,
+    ),
+    complete: bool = Option(
+        None,
+        help="Removes all completed tasks. Pass --no-complete to remove all pending tasks.",
+        show_default=False,
+    ),
+    all: bool = Option(
+        False,
+        help="Deletes/clears all tasks",
+        show_default=False,
+    ),
 ) -> None:
-    db.deleteTask(id)
+    db.deleteTask(id, complete, all)
 
 
 short_help = "Update a present Task"
@@ -55,9 +75,20 @@ help = "Update a Task -- change title or description -- from your list with the 
     short_help=short_help,
 )
 def updateTask(
-    id: int = Argument(help="Task ID"),
-    title: str = Option(None, help="Provide new title of the task"),
-    description: str = Option(None, help="Provide new description of the task"),
+    id: int = Argument(
+        help="Task ID",
+        show_default=False,
+    ),
+    title: str = Option(
+        None,
+        help="Provide new title of the task",
+        show_default=False,
+    ),
+    description: str = Option(
+        None,
+        help="Provide new description of the task",
+        show_default=None,
+    ),
 ) -> None:
     db.updateTask(id, title, description)
 
@@ -74,8 +105,16 @@ and last tasks together is greater than the total tasks present then shows entir
     short_help=short_help,
 )
 def view(
-    first: int = Option(None, help="Shows first N tasks"),
-    last: int = Option(None, help="Shows last N tasks"),
+    first: int = Option(
+        None,
+        help="Shows first N tasks",
+        show_default=False,
+    ),
+    last: int = Option(
+        None,
+        help="Shows last N tasks",
+        show_default=False,
+    ),
 ) -> None:
     if first and last:
         if first + last > db.getRowCount():
@@ -99,7 +138,8 @@ help = "Mark a task as completed. When a task is complete the status field is ma
 @cliapp.command(name="complete", help=help, short_help=short_help)
 def completeTask(
     id: int = Argument(
-        help="ID of task which is to be marked complete. Specifying 0 marks all current pending task as complete."
+        help="ID of task which is to be marked complete. Specifying 0 marks all current pending task as complete.",
+        show_default=False,
     ),
 ):
     db.updateStatus(id, True)

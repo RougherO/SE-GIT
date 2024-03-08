@@ -26,12 +26,20 @@ def insertTask(task: Task) -> None:
     conn.commit()
 
 
-def deleteTask(id: int | None = None) -> None:
-    cursor.execute(
-        "DELETE FROM TASKS WHERE ROWID={}".format(id)
-        if id
-        else "DELETE FROM TASKS WHERE ROWID = (SELECT MAX(ROWID) FROM TASKS)"
-    )
+def deleteTask(
+    id: int | None = None, status: bool | None = None, all: bool = False
+) -> None:
+    if all:
+        cursor.execute("DROP TABLE TASKS")
+        createTable()
+    elif status != None:
+        cursor.execute("DELETE FROM TASKS WHERE STATUS={}".format(1 if status else 0))
+    else:
+        cursor.execute(
+            "DELETE FROM TASKS WHERE ROWID={}".format(id)
+            if id
+            else "DELETE FROM TASKS WHERE ROWID = (SELECT MAX(ROWID) FROM TASKS)"
+        )
     conn.commit()
 
 
