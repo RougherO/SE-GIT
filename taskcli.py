@@ -76,19 +76,23 @@ and last tasks together is greater than the total tasks present then shows entir
 def view(
     first: int = Option(None, help="Shows first N tasks"),
     last: int = Option(None, help="Shows last N tasks"),
+    complete: bool = Option(
+        None,
+        help="Show tasks that are completed. Use --no-complete to show incomplete task",
+    ),
 ) -> None:
     if first and last:
         if first + last > db.getRowCount():
-            table.composeTable(db.getTasks())
+            table.composeTable(db.getTasks(n=None, status=complete))
         else:
-            table.composeTable(db.getTasks(-last))
-            table.composeTable(db.getTasks(first))
+            table.composeTable(db.getTasks(n=-last, status=complete))
+            table.composeTable(db.getTasks(n=first, status=complete))
     elif first:
-        table.composeTable(db.getTasks(first))
+        table.composeTable(db.getTasks(n=first, status=complete))
     elif last:
-        table.composeTable(db.getTasks(-last))
+        table.composeTable(db.getTasks(n=-last, status=complete))
     else:
-        table.composeTable(db.getTasks())
+        table.composeTable(db.getTasks(n=None, status=complete))
     table.renderTable()
 
 
