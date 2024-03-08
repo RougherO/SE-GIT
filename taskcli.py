@@ -115,19 +115,24 @@ def view(
         help="Shows last N tasks",
         show_default=False,
     ),
+    complete: bool = Option(
+        None,
+        help="Show tasks that are completed. Use --no-complete to show incomplete task",
+        show_default=False,
+    ),
 ) -> None:
     if first and last:
         if first + last > db.getRowCount():
-            table.composeTable(db.getTasks())
+            table.composeTable(db.getTasks(n=None, status=complete))
         else:
-            table.composeTable(db.getTasks(-last))
-            table.composeTable(db.getTasks(first))
+            table.composeTable(db.getTasks(n=-last, status=complete))
+            table.composeTable(db.getTasks(n=first, status=complete))
     elif first:
-        table.composeTable(db.getTasks(first))
+        table.composeTable(db.getTasks(n=first, status=complete))
     elif last:
-        table.composeTable(db.getTasks(-last))
+        table.composeTable(db.getTasks(n=-last, status=complete))
     else:
-        table.composeTable(db.getTasks())
+        table.composeTable(db.getTasks(n=None, status=complete))
     table.renderTable()
 
 

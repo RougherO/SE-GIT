@@ -61,7 +61,7 @@ def updateTask(id: int, title: str = None, description: str = None):
     conn.commit()
 
 
-def getTasks(n: int | None = None):
+def getTasks(n: int | None = None, status: bool | None = None):
     command = (
         (
             "SELECT ROWID, T.* FROM TASKS AS T WHERE ROWID > (SELECT COUNT(*) - {} FROM TASKS)".format(
@@ -70,8 +70,10 @@ def getTasks(n: int | None = None):
             if n < 0
             else "SELECT ROWID, T.* FROM TASKS AS T WHERE ROWID <= {}".format(n)
         )
+        + (" AND STATUS={}".format(1 if status else 0) if status != None else "")
         if n
-        else "SELECT ROWID, T.* FROM TASKS AS T"
+        else ("SELECT ROWID, T.* FROM TASKS AS T")
+        + (" WHERE STATUS={}".format(1 if status else 0) if status != None else "")
     )
 
     for row in cursor.execute(command):
