@@ -92,6 +92,19 @@ def view(
     table.renderTable()
 
 
+short_help = "Complete a task"
+help = "Mark a task as completed. When a task is complete the status field is marked FINISHED."
+
+
+@cliapp.command(name="complete", help=help, short_help=short_help)
+def completeTask(
+    id: int = Argument(
+        help="ID of task which is to be marked complete. Specifying 0 marks all current pending task as complete."
+    ),
+):
+    db.updateStatus(id, True)
+
+
 if __name__ == "__main__":
     db.createTable()
     cliapp()

@@ -75,10 +75,18 @@ def getRowCount():
 
 
 def updateStatus(id: int, status: bool):
-    cursor.execute(
-        "UPDATE TASKS SET STATUS={} WHERE ID={}".format(
-            status,
-            id,
+    if id > 0:
+        cursor.execute(
+            "UPDATE TASKS SET STATUS={} WHERE ROWID={}".format(
+                1 if status else 0,
+                id,
+            )
         )
-    )
+    else:
+        cursor.execute(
+            "UPDATE TASKS SET STATUS={} WHERE TRUE".format(
+                1 if status else 0,
+                id,
+            )
+        )
     conn.commit()
